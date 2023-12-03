@@ -46,8 +46,8 @@ abstract contract Deploy {
     mapping(address => uint256) private _deployerGasUsage;
 
     // temporary variables to store deployed contract addresses
-    Globals public globals;
     AuctionCrowdfund public auctionCrowdfund;
+    Globals public globals;
     RollingAuctionCrowdfund public rollingAuctionCrowdfund;
     BuyCrowdfund public buyCrowdfund;
     CollectionBuyCrowdfund public collectionBuyCrowdfund;
@@ -74,12 +74,6 @@ abstract contract Deploy {
     function deploy(LibDeployConstants.DeployConstants memory deployConstants) public virtual {
         _switchDeployer(DeployerRole.Default);
 
-        // DEPLOY_GLOBALS
-        console.log("");
-        console.log("### Globals");
-        console.log("  Deploying - Globals");
-        globals = new Globals(this.getDeployer());
-        console.log("  Deployed - Globals", address(globals));
 
         // DEPLOY_TOKEN_DISTRIBUTOR
         console.log("");
@@ -94,6 +88,13 @@ abstract contract Deploy {
         _trackDeployerGasAfter();
         console.log("  Deployed - TokenDistributor", address(tokenDistributor));
         _switchDeployer(DeployerRole.Default);
+
+        // DEPLOY_GLOBALS
+        console.log("");
+        console.log("### Globals");
+        console.log("  Deploying - Globals");
+        globals = new Globals(this.getDeployer());
+        console.log("  Deployed - Globals", address(globals));
 
         // DEPLOY_PROPOSAL_EXECUTION_ENGINE
         console.log("");

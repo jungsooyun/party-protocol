@@ -65,6 +65,9 @@ contract Globals is IGlobals, Multicall {
     }
 
     function getImplementation(uint256 key) external view returns (Implementation) {
+        if (_wordValues[key] == bytes32(0)) {
+            return Implementation(address(0));
+        }
         return Implementation(address(uint160(uint256(_wordValues[key]))));
     }
 

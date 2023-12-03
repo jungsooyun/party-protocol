@@ -923,7 +923,7 @@
               },
               {
                 "internalType": "bool",
-                "name": "allowOperatorsToSpendPartyEth",
+                "name": "allowOperators",
                 "type": "bool"
               },
               {
