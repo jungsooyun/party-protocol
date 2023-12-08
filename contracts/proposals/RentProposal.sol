@@ -35,7 +35,7 @@ contract RentProposal {
     function _executeRent(
         IProposalExecutionEngine.ExecuteProposalParams memory params)
         internal returns (bytes memory nextProgressData) {
-            RentProposalData memory rentalData = abi.decode(params.progressData, (RentProposalData));
+            RentProposalData memory rentalData = abi.decode(params.proposalData, (RentProposalData));
             // 필요한 조건 검증
             require(rentalData.expires > block.timestamp, "Proposal is not executable");
             // uint256 ethAvailable = allowRentToSpendPartyEth ? address(this).balance : msg.value;
