@@ -10,6 +10,7 @@ import "./ListOnOpenseaProposal.sol";
 import "./ListOnOpenseaAdvancedProposal.sol";
 import "./ListOnZoraProposal.sol";
 import "./FractionalizeProposal.sol";
+import "./RentProposal.sol";
 import "./ArbitraryCallsProposal.sol";
 import "./ProposalStorage.sol";
 import "./DistributeProposal.sol";
@@ -26,6 +27,7 @@ contract ProposalExecutionEngine is
     ListOnOpenseaAdvancedProposal,
     ListOnZoraProposal,
     FractionalizeProposal,
+    RentProposal,
     ArbitraryCallsProposal,
     DistributeProposal,
     AddAuthorityProposal,
@@ -44,6 +46,7 @@ contract ProposalExecutionEngine is
         ListOnOpensea,
         ListOnZora,
         Fractionalize,
+        Rent,
         ArbitraryCalls,
         UpgradeProposalEngineImpl,
         ListOnOpenseaAdvanced,
@@ -104,6 +107,7 @@ contract ProposalExecutionEngine is
         ListOnOpenseaAdvancedProposal(globals)
         ListOnZoraProposal(globals, zora)
         FractionalizeProposal(fractionalVaultFactory)
+        RentProposal(globals)
         ArbitraryCallsProposal(zora)
     {
         _GLOBALS = globals;
@@ -227,6 +231,8 @@ contract ProposalExecutionEngine is
             nextProgressData = _executeListOnZora(params);
         } else if (pt == ProposalType.Fractionalize) {
             nextProgressData = _executeFractionalize(params);
+        } else if (pt == ProposalType.Rent) {
+            nextProgressData = _executeRent(params);
         } else if (pt == ProposalType.ArbitraryCalls) {
             nextProgressData = _executeArbitraryCalls(
                 params,

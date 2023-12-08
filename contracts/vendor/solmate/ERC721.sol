@@ -134,7 +134,7 @@ abstract contract ERC721 is IERC721, EIP165 {
                               ERC165 LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    function supportsInterface(bytes4 interfaceId) public pure virtual override returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public pure virtual override(EIP165, IERC165) returns (bool) {
         // NOTE: modified from original to call super.
         return
             super.supportsInterface(interfaceId) ||

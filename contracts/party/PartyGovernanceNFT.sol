@@ -259,39 +259,39 @@ contract PartyGovernanceNFT is PartyGovernance, ERC721, IERC2981 {
         uint256[] memory tokenIds,
         bool checkIfAuthorizedToBurn
     ) private returns (uint96 totalVotingPowerBurned) {
-        for (uint256 i; i < tokenIds.length; ++i) {
-            uint256 tokenId = tokenIds[i];
+        // for (uint256 i; i < tokenIds.length; ++i) {
+        //     uint256 tokenId = tokenIds[i];
 
-            // Check if caller is authorized to burn the token.
-            address owner = ownerOf(tokenId);
-            if (checkIfAuthorizedToBurn) {
-                if (
-                    msg.sender != owner &&
-                    getApproved[tokenId] != msg.sender &&
-                    !isApprovedForAll[owner][msg.sender]
-                ) {
-                    revert UnauthorizedToBurnError();
-                }
-            }
+        //     // Check if caller is authorized to burn the token.
+        //     address owner = ownerOf(tokenId);
+        //     if (checkIfAuthorizedToBurn) {
+        //         if (
+        //             msg.sender != owner &&
+        //             getApproved[tokenId] != msg.sender &&
+        //             !isApprovedForAll[owner][msg.sender]
+        //         ) {
+        //             revert UnauthorizedToBurnError();
+        //         }
+        //     }
 
-            // Must be retrieved before updating voting power for token to be burned.
-            uint96 votingPower = votingPowerByTokenId[tokenId].safeCastUint256ToUint96();
+        //     // Must be retrieved before updating voting power for token to be burned.
+        //     uint96 votingPower = votingPowerByTokenId[tokenId].safeCastUint256ToUint96();
 
-            totalVotingPowerBurned += votingPower;
+        //     totalVotingPowerBurned += votingPower;
 
-            // Update voting power for token to be burned.
-            delete votingPowerByTokenId[tokenId];
-            emit PartyCardIntrinsicVotingPowerSet(tokenId, 0);
-            _adjustVotingPower(owner, -votingPower.safeCastUint96ToInt192(), address(0));
+        //     // Update voting power for token to be burned.
+        //     delete votingPowerByTokenId[tokenId];
+        //     emit PartyCardIntrinsicVotingPowerSet(tokenId, 0);
+        //     _adjustVotingPower(owner, -votingPower.safeCastUint96ToInt192(), address(0));
 
-            // Burn token.
-            _burn(tokenId);
+        //     // Burn token.
+        //     _burn(tokenId);
 
-            emit Burn(msg.sender, tokenId, votingPower);
-        }
+        //     emit Burn(msg.sender, tokenId, votingPower);
+        // }
 
-        // Update minted voting power.
-        mintedVotingPower -= totalVotingPowerBurned;
+        // // Update minted voting power.
+        // mintedVotingPower -= totalVotingPowerBurned;
     }
 
     /// @notice Burn governance NFT and remove its voting power. Can only be
@@ -305,23 +305,26 @@ contract PartyGovernanceNFT is PartyGovernance, ERC721, IERC2981 {
 
     /// @notice Set the timestamp until which ragequit is enabled.
     /// @param newRageQuitTimestamp The new ragequit timestamp.
+
+    // 내가 주석처리 함
     function setRageQuit(uint40 newRageQuitTimestamp) external onlyHost {
         // Prevent disabling ragequit after initialization.
-        if (newRageQuitTimestamp == DISABLE_RAGEQUIT_PERMANENTLY) {
-            revert CannotDisableRageQuitAfterInitializationError();
-        }
+        
+        // if (newRageQuitTimestamp == DISABLE_RAGEQUIT_PERMANENTLY) {
+        //     revert CannotDisableRageQuitAfterInitializationError();
+        // }
 
-        uint40 oldRageQuitTimestamp = rageQuitTimestamp;
+        // uint40 oldRageQuitTimestamp = rageQuitTimestamp;
 
-        // Prevent setting timestamp if it is permanently enabled/disabled.
-        if (
-            oldRageQuitTimestamp == ENABLE_RAGEQUIT_PERMANENTLY ||
-            oldRageQuitTimestamp == DISABLE_RAGEQUIT_PERMANENTLY
-        ) {
-            revert FixedRageQuitTimestampError(oldRageQuitTimestamp);
-        }
+        // // Prevent setting timestamp if it is permanently enabled/disabled.
+        // if (
+        //     oldRageQuitTimestamp == ENABLE_RAGEQUIT_PERMANENTLY ||
+        //     oldRageQuitTimestamp == DISABLE_RAGEQUIT_PERMANENTLY
+        // ) {
+        //     revert FixedRageQuitTimestampError(oldRageQuitTimestamp);
+        // }
 
-        emit RageQuitSet(oldRageQuitTimestamp, rageQuitTimestamp = newRageQuitTimestamp);
+        // emit RageQuitSet(oldRageQuitTimestamp, rageQuitTimestamp = newRageQuitTimestamp);
     }
 
     /// @notice Burn a governance NFT and withdraw a fair share of fungible tokens from the party.
@@ -330,109 +333,111 @@ contract PartyGovernanceNFT is PartyGovernance, ERC721, IERC2981 {
     ///                       `ETH_ADDRESS` value to withdraw ETH.
     /// @param minWithdrawAmounts The minimum amount of to withdraw for each token.
     /// @param receiver The address to receive the withdrawn tokens.
+
+    // 내가 주석처리 함
     function rageQuit(
         uint256[] calldata tokenIds,
         IERC20[] calldata withdrawTokens,
         uint256[] calldata minWithdrawAmounts,
         address receiver
     ) external {
-        if (tokenIds.length == 0) revert NothingToBurnError();
+        // if (tokenIds.length == 0) revert NothingToBurnError();
 
-        // Check if ragequit is allowed.
-        uint40 currentRageQuitTimestamp = rageQuitTimestamp;
-        if (currentRageQuitTimestamp != ENABLE_RAGEQUIT_PERMANENTLY) {
-            if (
-                currentRageQuitTimestamp == DISABLE_RAGEQUIT_PERMANENTLY ||
-                currentRageQuitTimestamp < block.timestamp
-            ) {
-                revert CannotRageQuitError(currentRageQuitTimestamp);
-            }
-        }
+        // // Check if ragequit is allowed.
+        // uint40 currentRageQuitTimestamp = rageQuitTimestamp;
+        // if (currentRageQuitTimestamp != ENABLE_RAGEQUIT_PERMANENTLY) {
+        //     if (
+        //         currentRageQuitTimestamp == DISABLE_RAGEQUIT_PERMANENTLY ||
+        //         currentRageQuitTimestamp < block.timestamp
+        //     ) {
+        //         revert CannotRageQuitError(currentRageQuitTimestamp);
+        //     }
+        // }
 
-        // Used as a reentrancy guard. Will be updated back after ragequit.
-        rageQuitTimestamp = DISABLE_RAGEQUIT_PERMANENTLY;
+        // // Used as a reentrancy guard. Will be updated back after ragequit.
+        // rageQuitTimestamp = DISABLE_RAGEQUIT_PERMANENTLY;
 
-        // Update last rage quit timestamp.
-        lastRageQuitTimestamp = uint40(block.timestamp);
+        // // Update last rage quit timestamp.
+        // lastRageQuitTimestamp = uint40(block.timestamp);
 
-        // Sum up total amount of each token to withdraw.
-        uint256[] memory withdrawAmounts = new uint256[](withdrawTokens.length);
-        {
-            IERC20 prevToken;
-            for (uint256 i; i < withdrawTokens.length; ++i) {
-                IERC20 token = withdrawTokens[i];
+        // // Sum up total amount of each token to withdraw.
+        // uint256[] memory withdrawAmounts = new uint256[](withdrawTokens.length);
+        // {
+        //     IERC20 prevToken;
+        //     for (uint256 i; i < withdrawTokens.length; ++i) {
+        //         IERC20 token = withdrawTokens[i];
 
-                // Check if order of tokens to transfer is valid.
-                // Prevent null and duplicate transfers.
-                if (prevToken >= token) revert InvalidTokenOrderError();
+        //         // Check if order of tokens to transfer is valid.
+        //         // Prevent null and duplicate transfers.
+        //         if (prevToken >= token) revert InvalidTokenOrderError();
 
-                prevToken = token;
+        //         prevToken = token;
 
-                // Check token's balance.
-                uint256 balance = address(token) == ETH_ADDRESS
-                    ? address(this).balance
-                    : token.balanceOf(address(this));
+        //         // Check token's balance.
+        //         uint256 balance = address(token) == ETH_ADDRESS
+        //             ? address(this).balance
+        //             : token.balanceOf(address(this));
 
-                // Add fair share of tokens from the party to total.
-                for (uint256 j; j < tokenIds.length; ++j) {
-                    // Must be retrieved before burning the token.
-                    uint256 shareOfVotingPower = getVotingPowerShareOf(tokenIds[j]);
+        //         // Add fair share of tokens from the party to total.
+        //         for (uint256 j; j < tokenIds.length; ++j) {
+        //             // Must be retrieved before burning the token.
+        //             uint256 shareOfVotingPower = getVotingPowerShareOf(tokenIds[j]);
 
-                    withdrawAmounts[i] += (balance * shareOfVotingPower) / 1e18;
-                }
-            }
-        }
-        {
-            // Burn caller's party cards. This will revert if caller is not the
-            // the owner or approved for any of the card they are attempting to
-            // burn or if there are duplicate token IDs.
-            uint96 totalVotingPowerBurned = _burnAndUpdateVotingPower(tokenIds, true);
+        //             withdrawAmounts[i] += (balance * shareOfVotingPower) / 1e18;
+        //         }
+        //     }
+        // }
+        // {
+        //     // Burn caller's party cards. This will revert if caller is not the
+        //     // the owner or approved for any of the card they are attempting to
+        //     // burn or if there are duplicate token IDs.
+        //     uint96 totalVotingPowerBurned = _burnAndUpdateVotingPower(tokenIds, true);
 
-            // Update total voting power of party.
-            _governanceValues.totalVotingPower -= totalVotingPowerBurned;
-        }
-        {
-            uint16 feeBps_ = feeBps;
-            for (uint256 i; i < withdrawTokens.length; ++i) {
-                IERC20 token = withdrawTokens[i];
-                uint256 amount = withdrawAmounts[i];
+        //     // Update total voting power of party.
+        //     _governanceValues.totalVotingPower -= totalVotingPowerBurned;
+        // }
+        // {
+        //     uint16 feeBps_ = feeBps;
+        //     for (uint256 i; i < withdrawTokens.length; ++i) {
+        //         IERC20 token = withdrawTokens[i];
+        //         uint256 amount = withdrawAmounts[i];
 
-                // Take fee from amount.
-                uint256 fee = (amount * feeBps_) / 1e4;
+        //         // Take fee from amount.
+        //         uint256 fee = (amount * feeBps_) / 1e4;
 
-                if (fee > 0) {
-                    amount -= fee;
+        //         if (fee > 0) {
+        //             amount -= fee;
 
-                    // Transfer fee to fee recipient.
-                    if (address(token) == ETH_ADDRESS) {
-                        payable(feeRecipient).transferEth(fee);
-                    } else {
-                        token.compatTransfer(feeRecipient, fee);
-                    }
-                }
+        //             // Transfer fee to fee recipient.
+        //             if (address(token) == ETH_ADDRESS) {
+        //                 payable(feeRecipient).transferEth(fee);
+        //             } else {
+        //                 token.compatTransfer(feeRecipient, fee);
+        //             }
+        //         }
 
-                if (amount > 0) {
-                    uint256 minAmount = minWithdrawAmounts[i];
+        //         if (amount > 0) {
+        //             uint256 minAmount = minWithdrawAmounts[i];
 
-                    // Check amount is at least minimum.
-                    if (amount < minAmount) {
-                        revert BelowMinWithdrawAmountError(amount, minAmount);
-                    }
+        //             // Check amount is at least minimum.
+        //             if (amount < minAmount) {
+        //                 revert BelowMinWithdrawAmountError(amount, minAmount);
+        //             }
 
-                    // Transfer token from party to recipient.
-                    if (address(token) == ETH_ADDRESS) {
-                        payable(receiver).transferEth(amount);
-                    } else {
-                        token.compatTransfer(receiver, amount);
-                    }
-                }
-            }
-        }
+        //             // Transfer token from party to recipient.
+        //             if (address(token) == ETH_ADDRESS) {
+        //                 payable(receiver).transferEth(amount);
+        //             } else {
+        //                 token.compatTransfer(receiver, amount);
+        //             }
+        //         }
+        //     }
+        // }
 
-        // Update ragequit timestamp back to before.
-        rageQuitTimestamp = currentRageQuitTimestamp;
+        // // Update ragequit timestamp back to before.
+        // rageQuitTimestamp = currentRageQuitTimestamp;
 
-        emit RageQuit(msg.sender, tokenIds, withdrawTokens, receiver);
+        // emit RageQuit(msg.sender, tokenIds, withdrawTokens, receiver);
     }
 
     /// @inheritdoc ERC721

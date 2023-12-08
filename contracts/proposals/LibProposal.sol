@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.20;
 
-import "../tokens/IERC721.sol";
+import "openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 library LibProposal {
     uint256 internal constant PROPOSAL_FLAG_UNANIMOUS = 0x1;
